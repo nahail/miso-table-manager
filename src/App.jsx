@@ -1,18 +1,30 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Users, Plus, Trash2, Edit3, Check, X, RefreshCw, 
-  Settings, Wifi, AlertTriangle, Layers, Clock, Sparkles, Filter, ChevronRight
+  Layers, Clock, Filter, LogOut, UserCheck
 } from 'lucide-react';
 import { 
   getSupabase, 
   isSupabaseConfigured, 
-  getStoredCredentials, 
-  saveSupabaseCredentials, 
   DEFAULT_TABLES 
 } from './lib/supabaseClient';
+import Login from './components/Login';
 
 export default function App() {
-  // State
+  // Staff Authentication State
+  const [currentStaff, setCurrentStaff] = useState(() => {
+    const saved = localStorage.getItem('miso_staff_session');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  // Table Data & Filter State
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFloor, setSelectedFloor] = useState('all'); // 'all' or 1..5
@@ -22,7 +34,6 @@ export default function App() {
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // Form State
@@ -30,16 +41,22 @@ export default function App() {
   const [formFloor, setFormFloor] = useState(1);
   const [formSeats, setFormSeats] = useState(4);
 
-  // Supabase Credentials Settings Form
-  const [settingsUrl, setSettingsUrl] = useState('');
-  const [settingsKey, setSettingsKey] = useState('');
+  // Backend Realtime Connection
   const [supabaseConnected, setSupabaseConnected] = useState(false);
-  const [syncStatus, setSyncStatus] = useState('Connecting...');
+
+  // Set default floor based on staff role when logged in
+  useEffect(() => {
+    if (currentStaff && currentStaff.assignedFloor) {
+      setSelectedFloor(currentStaff.assignedFloor);
+    }
+  }, [currentStaff]);
 
   // Initialize and Fetch Tables
   useEffect(() => {
-    initApp();
-  }, []);
+    if (currentStaff) {
+      initApp();
+    }
+  }, [currentStaff]);
 
   const initApp = async () => {
     setLoading(true);
@@ -57,16 +74,12 @@ export default function App() {
             .order('name', { ascending: true });
 
           if (error) {
-            console.error('Supabase fetch error, falling back to local storage:', error);
+            console.error('Supabase fetch error, using local tables:', error);
             loadLocalTables();
-            setSyncStatus('Error connecting to Supabase (check RLS / URL)');
           } else if (data && data.length > 0) {
             setTables(data);
-            setSyncStatus('Live Supabase Realtime Connected');
           } else {
-            // If table in Supabase is empty, seed it
             loadLocalTables();
-            setSyncStatus('Supabase connected (0 tables found)');
           }
         } catch (err) {
           console.error(err);
@@ -77,14 +90,13 @@ export default function App() {
       }
     } else {
       loadLocalTables();
-      setSyncStatus('Offline Local Mode (Save credentials in Settings for Multi-Device)');
     }
     setLoading(false);
   };
 
-  // Setup Supabase Realtime Listener
+  // Setup Supabase Realtime Listener (multi-device live updates)
   useEffect(() => {
-    if (!supabaseConnected) return;
+    if (!supabaseConnected || !currentStaff) return;
 
     const supabase = getSupabase();
     if (!supabase) return;
@@ -108,7 +120,7 @@ export default function App() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabaseConnected]);
+  }, [supabaseConnected, currentStaff]);
 
   const loadLocalTables = () => {
     const cached = localStorage.getItem('miso_local_tables');
@@ -150,7 +162,6 @@ export default function App() {
 
         if (error) {
           console.error('Failed to update table in Supabase:', error);
-          alert('Could not sync with Supabase: ' + error.message);
         }
       }
     } else {
@@ -176,7 +187,7 @@ export default function App() {
       if (supabase) {
         const { data, error } = await supabase.from('tables').insert([newTableData]).select();
         if (error) {
-          alert('Failed to add table to Supabase: ' + error.message);
+          alert('Failed to add table: ' + error.message);
           return;
         }
         if (data && data[0]) {
@@ -253,12 +264,10 @@ export default function App() {
     setFormSeats(table.seats);
   };
 
-  // Save Settings Modal
-  const handleSaveSettings = (e) => {
-    e.preventDefault();
-    saveSupabaseCredentials(settingsUrl, settingsKey);
-    setIsSettingsOpen(false);
-    window.location.reload();
+  // Staff Logout
+  const handleLogout = () => {
+    localStorage.removeItem('miso_staff_session');
+    setCurrentStaff(null);
   };
 
   // Filtered tables
@@ -315,10 +324,15 @@ export default function App() {
     return `${mins}m`;
   };
 
+  // If staff is not logged in, show Staff Login Screen
+  if (!currentStaff) {
+    return <Login onLoginSuccess={(session) => setCurrentStaff(session)} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#0c0d10] text-neutral-100 flex flex-col font-sans">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-30 bg-[#121318]/90 backdrop-blur-md border-b border-neutral-800 px-4 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      {/* Top Staff Navigation Bar */}
+      <header className="sticky top-0 z-30 bg-[#121318]/95 backdrop-blur-md border-b border-neutral-800 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center text-xl shadow-lg shadow-orange-500/20">
             🍜
@@ -334,7 +348,7 @@ export default function App() {
         </div>
 
         {/* Global Summary Badge */}
-        <div className="hidden sm:flex items-center gap-2 text-xs bg-neutral-900 border border-neutral-800 rounded-xl p-1.5 px-3">
+        <div className="hidden md:flex items-center gap-2 text-xs bg-neutral-900 border border-neutral-800 rounded-xl p-1.5 px-3">
           <div className="flex items-center gap-1.5 pr-3 border-r border-neutral-800">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="text-neutral-400">Available:</span>
@@ -347,7 +361,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Right Action Bar: Add Table & Staff Profile */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => {
@@ -362,56 +376,32 @@ export default function App() {
             <span>Add Table</span>
           </button>
 
-          <button
-            onClick={() => {
-              const creds = getStoredCredentials();
-              setSettingsUrl(creds.supabaseUrl || '');
-              setSettingsKey(creds.supabaseKey || '');
-              setIsSettingsOpen(true);
-            }}
-            title="Supabase Settings & Sync"
-            className={`p-2 rounded-xl border text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
-              supabaseConnected
-                ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-neutral-700'
-                : 'bg-amber-950/40 border-amber-500/40 text-amber-300 hover:bg-amber-900/40'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span className="hidden md:inline">{supabaseConnected ? 'Supabase Live' : 'Connect Supabase'}</span>
-          </button>
+          {/* Active Staff Badge & Logout */}
+          <div className="flex items-center gap-2 pl-2 border-l border-neutral-800">
+            <div className="text-right hidden sm:block">
+              <div className="text-xs font-bold text-white flex items-center justify-end gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                {currentStaff.name}
+              </div>
+              <div className="text-[10px] text-orange-400/90 font-medium">
+                {currentStaff.role} {currentStaff.assignedFloor !== 'all' ? `• Floor ${currentStaff.assignedFloor}` : ''}
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              title="Sign Out of Shift"
+              className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-rose-950/40 hover:border-rose-500/40 text-neutral-400 hover:text-rose-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Main Content Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-6">
-        
-        {/* Connection Notice if Not in Supabase */}
-        {!supabaseConnected && (
-          <div className="bg-amber-950/30 border border-amber-600/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 mt-0.5">
-                <AlertTriangle className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-amber-200">Running in Local Mode</h4>
-                <p className="text-xs text-amber-300/80 mt-0.5">
-                  Tables can be clicked and tested right now. To enable instant live sync between reception & floor waiters across devices, connect your free Supabase database.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                const creds = getStoredCredentials();
-                setSettingsUrl(creds.supabaseUrl || '');
-                setSettingsKey(creds.supabaseKey || '');
-                setIsSettingsOpen(true);
-              }}
-              className="px-3.5 py-1.5 rounded-lg bg-amber-500 text-neutral-950 text-xs font-bold hover:bg-amber-400 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              Configure Supabase Free
-            </button>
-          </div>
-        )}
 
         {/* Floor Selection Tabs */}
         <section className="flex flex-col gap-3">
@@ -483,7 +473,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-neutral-400 font-medium mr-1 flex items-center gap-1">
               <Filter className="w-3.5 h-3.5 text-neutral-500" />
-              Filter Status:
+              Filter:
             </span>
             <button
               onClick={() => setStatusFilter('all')}
@@ -553,7 +543,7 @@ export default function App() {
             </div>
             <h3 className="text-base font-bold text-white">No tables match your filter</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-sm">
-              Try switching floors, clearing the party size filter, or add a new table using the button above.
+              Try switching floors or clearing the filter.
             </p>
             <button
               onClick={() => {
@@ -683,12 +673,12 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer Info */}
+      {/* Clean Restaurant Footer */}
       <footer className="mt-auto border-t border-neutral-900 bg-[#0e0f14] px-4 py-3 text-center text-xs text-neutral-500 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span>MISO Restaurant Operating System</span>
           <span>•</span>
-          <span className="text-neutral-400">{syncStatus}</span>
+          <span className="text-emerald-400/90 font-medium">System Online</span>
         </div>
         <div className="text-neutral-500 text-[11px]">
           Tap any table box to toggle between Available (Green) and Occupied (Red).
@@ -856,104 +846,6 @@ export default function App() {
                 >
                   Save Changes
                 </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* SUPABASE SETTINGS MODAL */}
-      {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16171d] border border-neutral-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-                  <Wifi className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">Supabase Free Cloud Database</h3>
-                  <p className="text-xs text-neutral-400">Enable instant multi-device live sync</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSettingsOpen(false)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveSettings} className="mt-5 flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Project URL
-                </label>
-                <input
-                  type="text"
-                  placeholder="https://xyzcompany.supabase.co"
-                  value={settingsUrl}
-                  onChange={(e) => setSettingsUrl(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-xs focus:outline-none focus:border-orange-500 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Anon Public Key
-                </label>
-                <textarea
-                  rows="3"
-                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                  value={settingsKey}
-                  onChange={(e) => setSettingsKey(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-xs focus:outline-none focus:border-orange-500 font-mono"
-                />
-                <p className="text-[11px] text-neutral-500 mt-1">
-                  Found in your Supabase Dashboard ➜ Project Settings ➜ API ➜ Project API keys (anon public).
-                </p>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-neutral-900/90 border border-neutral-800 text-xs text-neutral-400 flex flex-col gap-1.5">
-                <div className="font-semibold text-neutral-200 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-                  Quick Supabase Setup (100% Free):
-                </div>
-                <ol className="list-decimal list-inside space-y-1 text-[11px] text-neutral-400">
-                  <li>Create a free account at <strong>supabase.com</strong>.</li>
-                  <li>Click <strong>New Project</strong> (e.g. "miso-restaurant").</li>
-                  <li>Go to <strong>SQL Editor</strong>, paste the content of <code className="text-orange-300 font-mono">supabase-schema.sql</code>, and click <strong>Run</strong>.</li>
-                  <li>Paste your Project URL & Anon Key above, or add them to your Vercel Environment Variables.</li>
-                </ol>
-              </div>
-
-              <div className="flex items-center justify-between gap-2.5 mt-2 pt-3 border-t border-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    saveSupabaseCredentials('', '');
-                    setIsSettingsOpen(false);
-                    window.location.reload();
-                  }}
-                  className="text-xs text-rose-400 hover:text-rose-300 cursor-pointer"
-                >
-                  Clear / Disconnect
-                </button>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsSettingsOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
-                  >
-                    Save & Connect
-                  </button>
-                </div>
               </div>
             </form>
           </div>
