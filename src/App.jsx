@@ -45,6 +45,21 @@ export default function App() {
   const [supabaseConnected, setSupabaseConnected] = useState(false);
   const realtimeChannelRef = useRef(null);
 
+  // Clear legacy cache that may have had outdated mock IDs
+  useEffect(() => {
+    const cached = localStorage.getItem('miso_local_tables');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.length > 0 && String(parsed[0].id).length < 10) {
+          localStorage.removeItem('miso_local_tables');
+        }
+      } catch (e) {
+        localStorage.removeItem('miso_local_tables');
+      }
+    }
+  }, []);
+
   // Set default floor based on staff role when logged in
   useEffect(() => {
     if (currentStaff && currentStaff.assignedFloor) {
@@ -74,28 +89,21 @@ export default function App() {
             .order('floor', { ascending: true })
             .order('name', { ascending: true });
 
-          if (error) {
-            console.error('Supabase fetch error, using local tables:', error);
-            loadLocalTables();
-          } else if (data && data.length > 0) {
+          if (!error && data && data.length > 0) {
             setTables(data);
-          } else {
-            loadLocalTables();
+            setLoading(false);
+            return;
           }
         } catch (err) {
-          console.error(err);
-          loadLocalTables();
+          console.error('Supabase initial fetch failed:', err);
         }
-      } else {
-        loadLocalTables();
       }
-    } else {
-      loadLocalTables();
     }
+    loadLocalTables();
     setLoading(false);
   };
 
-  // Silent background refetch (used by polling & window focus)
+  // Silent background refetch
   const silentFetchTables = async () => {
     const supabase = getSupabase();
     if (!supabase) return;
@@ -114,7 +122,7 @@ export default function App() {
     }
   };
 
-  // Setup Multi-Device Realtime Sync (Broadcast + Postgres Changes + Background Poll)
+  // Setup Multi-Device Realtime Sync
   useEffect(() => {
     if (!supabaseConnected || !currentStaff) return;
 
@@ -122,18 +130,23 @@ export default function App() {
     if (!supabase) return;
 
     // 1. WebSocket Channel for Sub-second Broadcasts & DB changes
-    const channel = supabase.channel('miso_realtime_sync');
+    const channel = supabase.channel('miso_realtime_sync', {
+      config: {
+        broadcast: { ack: false },
+      },
+    });
     
     // Instant broadcast when any staff toggles a table
     channel
       .on('broadcast', { event: 'table_toggled' }, ({ payload }) => {
-        if (!payload || !payload.id) return;
+        if (!payload) return;
         setTables((prev) =>
-          prev.map((t) =>
-            t.id === payload.id
+          prev.map((t) => {
+            const isMatch = (payload.id && t.id === payload.id) || (t.name === payload.name && t.floor === payload.floor);
+            return isMatch
               ? { ...t, is_occupied: payload.is_occupied, seated_at: payload.seated_at }
-              : t
-          )
+              : t;
+          })
         );
       })
       // Broadcast when tables are added, edited, or removed
@@ -148,10 +161,10 @@ export default function App() {
 
     realtimeChannelRef.current = channel;
 
-    // 2. Continuous Background Poll (every 2.5 seconds) to guarantee sync across phones & tablets
+    // 2. Continuous Background Poll (every 2 seconds) to guarantee sync across phones & tablets
     const pollInterval = setInterval(() => {
       silentFetchTables();
-    }, 2500);
+    }, 2000);
 
     // 3. Sync immediately when waiter unlocks phone or switches back to browser tab
     const handleVisibilityChange = () => {
@@ -196,7 +209,9 @@ export default function App() {
 
     // 1. Optimistic Local Update
     const updatedTables = tables.map((t) =>
-      t.id === table.id ? { ...t, is_occupied: newOccupied, seated_at: seatedAt } : t
+      (t.id === table.id || (t.name === table.name && t.floor === table.floor))
+        ? { ...t, is_occupied: newOccupied, seated_at: seatedAt }
+        : t
     );
     setTables(updatedTables);
 
@@ -207,22 +222,30 @@ export default function App() {
         event: 'table_toggled',
         payload: {
           id: table.id,
+          name: table.name,
+          floor: table.floor,
           is_occupied: newOccupied,
           seated_at: seatedAt,
         },
       });
     }
 
-    // 3. Persist update to Supabase Database
+    // 3. Persist update to Supabase Database (handles both UUID and name matching)
     if (supabaseConnected) {
       const supabase = getSupabase();
       if (supabase) {
         try {
-          const { error } = await supabase
+          let query = supabase
             .from('tables')
-            .update({ is_occupied: newOccupied, seated_at: seatedAt })
-            .eq('id', table.id);
+            .update({ is_occupied: newOccupied, seated_at: seatedAt });
 
+          if (table.id && String(table.id).includes('-')) {
+            query = query.eq('id', table.id);
+          } else {
+            query = query.eq('name', table.name).eq('floor', table.floor);
+          }
+
+          const { error } = await query;
           if (error) {
             console.error('Database update error:', error);
           }
@@ -295,7 +318,13 @@ export default function App() {
     if (supabaseConnected) {
       const supabase = getSupabase();
       if (supabase) {
-        const { error } = await supabase.from('tables').update(updatedData).eq('id', editingTable.id);
+        let query = supabase.from('tables').update(updatedData);
+        if (String(editingTable.id).includes('-')) {
+          query = query.eq('id', editingTable.id);
+        } else {
+          query = query.eq('name', editingTable.name).eq('floor', editingTable.floor);
+        }
+        const { error } = await query;
         if (error) {
           alert('Failed to update table: ' + error.message);
           return;
@@ -322,7 +351,14 @@ export default function App() {
     if (supabaseConnected) {
       const supabase = getSupabase();
       if (supabase) {
-        const { error } = await supabase.from('tables').delete().eq('id', id);
+        let query = supabase.from('tables').delete();
+        if (String(id).includes('-')) {
+          query = query.eq('id', id);
+        } else {
+          const t = tables.find((x) => x.id === id);
+          if (t) query = query.eq('name', t.name).eq('floor', t.floor);
+        }
+        const { error } = await query;
         if (error) {
           alert('Failed to delete table: ' + error.message);
           return;
@@ -651,7 +687,7 @@ export default function App() {
 
               return (
                 <div
-                  key={table.id}
+                  key={table.id || `${table.floor}-${table.name}`}
                   onClick={() => handleToggleTable(table)}
                   className={`group relative rounded-3xl p-5 border transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[190px] select-none shadow-md ${
                     isOccupied
