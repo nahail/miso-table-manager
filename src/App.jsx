@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Users, Plus, Trash2, Edit3, Check, X, RefreshCw, 
   Layers, Clock, Filter, LogOut
@@ -168,12 +168,7 @@ export default function App() {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data[0]) {
-          setTables((prev) =>
-            [...prev, data[0]].sort((a, b) => a.floor - b.floor || a.name.localeCompare(b.name))
-          );
-        }
+        silentFetchTables();
       }
     } catch (err) {
       alert('Error adding table: ' + err.message);
@@ -304,34 +299,34 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0d10] text-neutral-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f8f9fa] text-stone-900 flex flex-col font-sans">
       {/* Top Staff Navigation Bar */}
-      <header className="sticky top-0 z-30 bg-[#121318]/95 backdrop-blur-md border-b border-neutral-800 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200/90 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center text-xl shadow-lg shadow-orange-500/20">
+          <div className="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-xs">
             🍜
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                MISO <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">TABLES</span>
+              <h1 className="text-xl font-extrabold tracking-tight text-stone-900 flex items-center gap-2">
+                MISO <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">TABLES</span>
               </h1>
             </div>
-            <p className="text-xs text-neutral-400">5-Story Restaurant Seating Manager</p>
+            <p className="text-xs text-stone-500 font-medium">5-Story Restaurant Seating Manager</p>
           </div>
         </div>
 
         {/* Global Summary Badge */}
-        <div className="hidden md:flex items-center gap-2 text-xs bg-neutral-900 border border-neutral-800 rounded-xl p-1.5 px-3">
-          <div className="flex items-center gap-1.5 pr-3 border-r border-neutral-800">
+        <div className="hidden md:flex items-center gap-2 text-xs bg-stone-50 border border-stone-200 rounded-xl p-1.5 px-3">
+          <div className="flex items-center gap-1.5 pr-3 border-r border-stone-200">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-neutral-400">Available:</span>
-            <span className="font-bold text-emerald-400">{floorStats.all.free} Tables ({floorStats.all.seats} Seats)</span>
+            <span className="text-stone-500">Available:</span>
+            <span className="font-bold text-emerald-700">{floorStats.all.free} Tables ({floorStats.all.seats} Seats)</span>
           </div>
           <div className="flex items-center gap-1.5 pl-1">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span className="text-neutral-400">Occupied:</span>
-            <span className="font-bold text-rose-400">{floorStats.all.total - floorStats.all.free} Tables</span>
+            <span className="text-stone-500">Occupied:</span>
+            <span className="font-bold text-rose-700">{floorStats.all.total - floorStats.all.free} Tables</span>
           </div>
         </div>
 
@@ -344,20 +339,20 @@ export default function App() {
               setFormSeats(4);
               setIsAddModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold shadow-lg shadow-orange-600/30 transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Table</span>
           </button>
 
           {/* Active Staff Badge & Logout */}
-          <div className="flex items-center gap-2 pl-2 border-l border-neutral-800">
+          <div className="flex items-center gap-2 pl-2 border-l border-stone-200">
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-bold text-white flex items-center justify-end gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <div className="text-xs font-bold text-stone-900 flex items-center justify-end gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 {currentStaff.name}
               </div>
-              <div className="text-[10px] text-orange-400/90 font-medium">
+              <div className="text-[10px] text-stone-500 font-semibold">
                 {currentStaff.role} {currentStaff.assignedFloor !== 'all' ? `• Floor ${currentStaff.assignedFloor}` : ''}
               </div>
             </div>
@@ -365,7 +360,7 @@ export default function App() {
             <button
               onClick={handleLogout}
               title="Sign Out of Shift"
-              className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-rose-950/40 hover:border-rose-500/40 text-neutral-400 hover:text-rose-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+              className="p-2 rounded-xl bg-stone-100 border border-stone-200 hover:bg-rose-50 hover:border-rose-200 text-stone-600 hover:text-rose-600 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -380,31 +375,31 @@ export default function App() {
         {/* Floor Selection Tabs */}
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-orange-500" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-500 flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-stone-600" />
               Select Floor
             </h2>
-            <div className="text-xs text-neutral-500">
+            <div className="text-xs font-medium text-stone-500">
               Showing {filteredTables.length} {filteredTables.length === 1 ? 'table' : 'tables'}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
             {/* All Floors Tab */}
             <button
               onClick={() => setSelectedFloor('all')}
-              className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
                 selectedFloor === 'all'
-                  ? 'bg-neutral-800 border-orange-500/60 shadow-lg ring-1 ring-orange-500/30'
-                  : 'bg-neutral-900/80 border-neutral-800/80 hover:bg-neutral-800/60 hover:border-neutral-700'
+                  ? 'bg-white border-2 border-stone-900 shadow-sm ring-1 ring-stone-900/10'
+                  : 'bg-white border border-stone-200 hover:border-stone-300 text-stone-700'
               }`}
             >
-              <div className="text-xs font-bold text-neutral-300">All Floors</div>
+              <div className="text-xs font-bold text-stone-600">All Floors</div>
               <div className="mt-1 flex items-baseline justify-between">
-                <span className="text-lg font-black text-white">{floorStats.all.free}</span>
-                <span className="text-[10px] text-neutral-400 font-medium">/{floorStats.all.total} free</span>
+                <span className="text-xl font-black text-stone-900">{floorStats.all.free}</span>
+                <span className="text-[11px] text-stone-500 font-semibold">/{floorStats.all.total} free</span>
               </div>
-              <div className="text-[10px] text-emerald-400 font-medium mt-0.5">{floorStats.all.seats} seats available</div>
+              <div className="text-[10px] text-emerald-700 font-bold mt-0.5">{floorStats.all.seats} seats open</div>
             </button>
 
             {/* Individual Floors 1 to 5 */}
@@ -417,23 +412,23 @@ export default function App() {
                 <button
                   key={fl}
                   onClick={() => setSelectedFloor(fl)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
+                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
                     isSelected
-                      ? 'bg-neutral-800 border-orange-500/60 shadow-lg ring-1 ring-orange-500/30'
-                      : 'bg-neutral-900/80 border-neutral-800/80 hover:bg-neutral-800/60 hover:border-neutral-700'
+                      ? 'bg-white border-2 border-stone-900 shadow-sm ring-1 ring-stone-900/10'
+                      : 'bg-white border border-stone-200 hover:border-stone-300 text-stone-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-300">Floor {fl}</span>
+                    <span className="text-xs font-bold text-stone-600">Floor {fl}</span>
                     <span className={`w-2 h-2 rounded-full ${hasFree ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                   </div>
                   <div className="mt-1 flex items-baseline justify-between">
-                    <span className={`text-lg font-black ${hasFree ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <span className={`text-xl font-black ${hasFree ? 'text-stone-900' : 'text-rose-600'}`}>
                       {stat.free}
                     </span>
-                    <span className="text-[10px] text-neutral-400 font-medium">/{stat.total} free</span>
+                    <span className="text-[11px] text-stone-500 font-semibold">/{stat.total} free</span>
                   </div>
-                  <div className="text-[10px] text-neutral-400 font-medium mt-0.5">
+                  <div className="text-[10px] text-stone-500 font-medium mt-0.5">
                     {stat.seats} seats open
                   </div>
                 </button>
@@ -443,28 +438,28 @@ export default function App() {
         </section>
 
         {/* Filter & Quick Helper Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-neutral-900/60 border border-neutral-800/80 rounded-2xl p-3 px-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-stone-200/90 rounded-2xl p-3 px-4 shadow-xs">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-neutral-400 font-medium mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5 text-neutral-500" />
+            <span className="text-xs text-stone-500 font-medium mr-1 flex items-center gap-1">
+              <Filter className="w-3.5 h-3.5 text-stone-400" />
               Filter:
             </span>
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 statusFilter === 'all'
-                  ? 'bg-neutral-800 text-white border border-neutral-700'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-stone-900 text-white shadow-xs'
+                  : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter('available')}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'available'
-                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/50'
-                  : 'text-neutral-400 hover:text-emerald-400'
+                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs'
+                  : 'text-stone-600 hover:bg-emerald-50 hover:text-emerald-700'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -472,10 +467,10 @@ export default function App() {
             </button>
             <button
               onClick={() => setStatusFilter('occupied')}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'occupied'
-                  ? 'bg-rose-950/80 text-rose-300 border border-rose-500/50'
-                  : 'text-neutral-400 hover:text-rose-400'
+                  ? 'bg-rose-100 text-rose-800 border border-rose-300 shadow-xs'
+                  : 'text-stone-600 hover:bg-rose-50 hover:text-rose-700'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-rose-500"></span>
@@ -485,7 +480,7 @@ export default function App() {
 
           {/* Party size filter for receptionists finding table for arriving group */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-400 font-medium">Party Size:</span>
+            <span className="text-xs text-stone-500 font-medium">Party Size:</span>
             <div className="flex items-center gap-1">
               {[0, 2, 4, 6, 8].map((size) => (
                 <button
@@ -493,8 +488,8 @@ export default function App() {
                   onClick={() => setPartySizeFilter(size)}
                   className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
                     partySizeFilter === size
-                      ? 'bg-orange-500 text-white shadow-md'
-                      : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-800 hover:text-white'
+                      ? 'bg-stone-900 text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
                   }`}
                 >
                   {size === 0 ? 'All' : `${size}+`}
@@ -506,17 +501,17 @@ export default function App() {
 
         {/* Tables Grid */}
         {loading ? (
-          <div className="py-24 flex flex-col items-center justify-center text-neutral-400 gap-3">
-            <RefreshCw className="w-8 h-8 animate-spin text-orange-500" />
+          <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+            <RefreshCw className="w-8 h-8 animate-spin text-stone-700" />
             <p className="text-sm font-medium">Loading tables across floors...</p>
           </div>
         ) : filteredTables.length === 0 ? (
-          <div className="py-20 bg-neutral-900/40 border border-neutral-800/80 rounded-3xl flex flex-col items-center justify-center text-center p-6">
-            <div className="w-16 h-16 rounded-2xl bg-neutral-800/80 flex items-center justify-center text-3xl mb-4 text-neutral-400">
+          <div className="py-20 bg-white border border-stone-200/90 rounded-3xl flex flex-col items-center justify-center text-center p-6 shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center text-3xl mb-4 text-stone-500">
               🪑
             </div>
-            <h3 className="text-base font-bold text-white">No tables match your filter</h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-sm">
+            <h3 className="text-base font-bold text-stone-900">No tables match your filter</h3>
+            <p className="text-xs text-stone-500 mt-1 max-w-sm">
               Try switching floors or clearing the filter.
             </p>
             <button
@@ -525,7 +520,7 @@ export default function App() {
                 setStatusFilter('all');
                 setPartySizeFilter(0);
               }}
-              className="mt-4 px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold text-white transition-all cursor-pointer"
+              className="mt-4 px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-stone-800 transition-all cursor-pointer border border-stone-200"
             >
               Reset Filters
             </button>
@@ -539,44 +534,46 @@ export default function App() {
                 <div
                   key={table.id || `${table.floor}-${table.name}`}
                   onClick={() => handleToggleTable(table)}
-                  className={`group relative rounded-3xl p-5 border transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[190px] select-none shadow-md ${
+                  className={`group relative rounded-3xl p-5 border-2 transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[195px] select-none shadow-xs hover:shadow-md ${
                     isOccupied
-                      ? 'bg-rose-950/40 border-rose-600/60 hover:bg-rose-950/60 hover:border-rose-500 shadow-rose-950/30'
-                      : 'bg-emerald-950/40 border-emerald-600/60 hover:bg-emerald-950/60 hover:border-emerald-500 shadow-emerald-950/30'
+                      ? 'bg-rose-50/70 border-rose-400/90 hover:bg-rose-100/70 hover:border-rose-500'
+                      : 'bg-emerald-50/70 border-emerald-500/80 hover:bg-emerald-100/70 hover:border-emerald-600'
                   }`}
                 >
                   {/* Card Top: Floor badge & Edit/Delete controls */}
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-neutral-900/80 text-neutral-300 border border-neutral-700">
-                        Floor {table.floor}
-                      </span>
-                    </div>
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs ${
+                      isOccupied 
+                        ? 'bg-white border-rose-200 text-rose-800' 
+                        : 'bg-white border-emerald-200 text-emerald-800'
+                    }`}>
+                      Floor {table.floor}
+                    </span>
 
                     {/* Manage table buttons */}
                     <div 
-                      className="opacity-60 group-hover:opacity-100 flex items-center gap-1 transition-opacity"
+                      className="opacity-70 group-hover:opacity-100 flex items-center gap-1 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
                         onClick={(e) => openEdit(table, e)}
                         title="Edit Table"
-                        className="p-1.5 rounded-lg bg-neutral-900/70 hover:bg-neutral-800 text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-stone-600 hover:text-stone-900 border border-stone-200/80 transition-colors cursor-pointer shadow-2xs"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       
                       {confirmDeleteId === table.id ? (
-                        <div className="flex items-center gap-1 bg-red-900/90 rounded-lg p-0.5 border border-red-500">
+                        <div className="flex items-center gap-1 bg-white rounded-lg p-0.5 border border-rose-300 shadow-xs">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteTable(table.id);
                             }}
                             title="Confirm delete"
-                            className="p-1 rounded text-red-200 hover:text-white"
+                            className="p-1 rounded text-rose-600 hover:bg-rose-50"
                           >
-                            <Check className="w-3 h-3 text-red-300" />
+                            <Check className="w-3.5 h-3.5 text-rose-600" />
                           </button>
                           <button
                             onClick={(e) => {
@@ -584,9 +581,9 @@ export default function App() {
                               setConfirmDeleteId(null);
                             }}
                             title="Cancel"
-                            className="p-1 rounded text-neutral-400 hover:text-white"
+                            className="p-1 rounded text-stone-400 hover:bg-stone-100"
                           >
-                            <X className="w-3 h-3" />
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       ) : (
@@ -596,7 +593,7 @@ export default function App() {
                             setConfirmDeleteId(table.id);
                           }}
                           title="Remove Table"
-                          className="p-1.5 rounded-lg bg-neutral-900/70 hover:bg-rose-900/60 text-neutral-400 hover:text-rose-300 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg bg-white/90 hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200/80 transition-colors cursor-pointer shadow-2xs"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -605,37 +602,37 @@ export default function App() {
                   </div>
 
                   {/* Card Center: Table Name & Seating capacity */}
-                  <div className="my-2">
-                    <h3 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <div className="my-2.5">
+                    <h3 className="text-xl font-extrabold text-stone-900 tracking-tight">
                       {table.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-1.5 text-xs font-semibold text-neutral-300">
-                      <Users className="w-4 h-4 text-orange-400" />
+                    <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold text-stone-600">
+                      <Users className="w-4 h-4 text-stone-500" />
                       <span>{table.seats} Chairs</span>
                     </div>
                   </div>
 
                   {/* Card Bottom: Status & Quick Tap Prompt */}
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                  <div className="pt-3 border-t border-stone-200/70 flex items-center justify-between">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-2.5 h-2.5 rounded-full ${isOccupied ? 'bg-rose-500 animate-pulse' : 'bg-emerald-400'}`} />
-                        <span className={`text-xs font-black uppercase tracking-wide ${isOccupied ? 'text-rose-400' : 'text-emerald-400'}`}>
+                        <span className={`w-2 h-2 rounded-full ${isOccupied ? 'bg-rose-500' : 'bg-emerald-500'}`} />
+                        <span className={`text-xs font-black uppercase tracking-wide ${isOccupied ? 'text-rose-800' : 'text-emerald-800'}`}>
                           {isOccupied ? 'OCCUPIED' : 'AVAILABLE'}
                         </span>
                       </div>
                       {isOccupied && table.seated_at && (
-                        <span className="text-[10px] text-neutral-400 flex items-center gap-1 mt-0.5">
+                        <span className="text-[10px] text-stone-500 font-medium flex items-center gap-1 mt-0.5">
                           <Clock className="w-2.5 h-2.5" />
                           {formatTimeSince(table.seated_at)}
                         </span>
                       )}
                     </div>
 
-                    <div className={`text-[10px] font-bold px-2.5 py-1 rounded-xl transition-all ${
+                    <div className={`text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all shadow-xs ${
                       isOccupied 
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 group-hover:bg-rose-500 group-hover:text-white'
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 group-hover:bg-emerald-500 group-hover:text-white'
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}>
                       {isOccupied ? 'Free Up ➜' : 'Seat Guests ➜'}
                     </div>
@@ -648,29 +645,29 @@ export default function App() {
       </main>
 
       {/* Clean Restaurant Footer */}
-      <footer className="mt-auto border-t border-neutral-900 bg-[#0e0f14] px-4 py-3 text-center text-xs text-neutral-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="mt-auto border-t border-stone-200 bg-white px-4 py-3.5 text-center text-xs text-stone-500 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span>MISO Restaurant Operating System</span>
+          <span className="font-semibold text-stone-700">MISO Restaurant System</span>
           <span>•</span>
-          <span className="text-emerald-400/90 font-medium">Real-Time Sync Active</span>
+          <span className="text-emerald-700 font-medium">Real-Time Sync Active</span>
         </div>
-        <div className="text-neutral-500 text-[11px]">
+        <div className="text-stone-500 text-[11px]">
           Tap any table box to toggle between Available (Green) and Occupied (Red).
         </div>
       </footer>
 
       {/* ADD TABLE MODAL */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16171d] border border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-orange-500" />
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-200">
+              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-stone-900" />
                 Add New Table
               </h3>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-900 hover:bg-stone-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -678,7 +675,7 @@ export default function App() {
 
             <form onSubmit={handleAddTable} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                   Table Name or Number
                 </label>
                 <input
@@ -687,19 +684,19 @@ export default function App() {
                   placeholder="e.g. Table 106, VIP Booth, Window 1"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                     Floor Level
                   </label>
                   <select
                     value={formFloor}
                     onChange={(e) => setFormFloor(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                   >
                     {[1, 2, 3, 4, 5].map((fl) => (
                       <option key={fl} value={fl}>Floor {fl}</option>
@@ -708,7 +705,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                     Chairs / Capacity
                   </label>
                   <input
@@ -718,22 +715,22 @@ export default function App() {
                     required
                     value={formSeats}
                     onChange={(e) => setFormSeats(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-neutral-800">
+              <div className="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-stone-200">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-900 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                 >
                   Create Table
                 </button>
@@ -745,16 +742,16 @@ export default function App() {
 
       {/* EDIT TABLE MODAL */}
       {editingTable && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16171d] border border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-orange-500" />
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-200">
+              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-stone-900" />
                 Edit Table
               </h3>
               <button
                 onClick={() => setEditingTable(null)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-900 hover:bg-stone-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -762,7 +759,7 @@ export default function App() {
 
             <form onSubmit={handleSaveEdit} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                   Table Name
                 </label>
                 <input
@@ -770,19 +767,19 @@ export default function App() {
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                     Floor Level
                   </label>
                   <select
                     value={formFloor}
                     onChange={(e) => setFormFloor(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                   >
                     {[1, 2, 3, 4, 5].map((fl) => (
                       <option key={fl} value={fl}>Floor {fl}</option>
@@ -791,7 +788,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
                     Chairs / Capacity
                   </label>
                   <input
@@ -801,22 +798,22 @@ export default function App() {
                     required
                     value={formSeats}
                     onChange={(e) => setFormSeats(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-white text-sm focus:outline-none focus:border-orange-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-neutral-800">
+              <div className="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-stone-200">
                 <button
                   type="button"
                   onClick={() => setEditingTable(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-900 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                 >
                   Save Changes
                 </button>
