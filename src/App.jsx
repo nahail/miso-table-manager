@@ -54,7 +54,7 @@ export default function App() {
   const initApp = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/tables');
+      const res = await fetch('/api/tables?_t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -73,7 +73,7 @@ export default function App() {
   // Silent background refetch (runs every 1.5s for instant multi-device sync)
   const silentFetchTables = async () => {
     try {
-      const res = await fetch('/api/tables');
+      const res = await fetch('/api/tables?_t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -128,6 +128,7 @@ export default function App() {
     try {
       const res = await fetch('/api/tables', {
         method: 'PATCH',
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: table.id,
@@ -139,12 +140,7 @@ export default function App() {
       });
 
       if (res.ok) {
-        const updated = await res.json();
-        if (Array.isArray(updated) && updated[0]) {
-          setTables((prev) =>
-            prev.map((t) => (t.id === updated[0].id ? updated[0] : t))
-          );
-        }
+        silentFetchTables();
       }
     } catch (err) {
       console.error('Update failed:', err);
