@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Users, Plus, Trash2, Edit3, Check, X, RefreshCw, 
-  Layers, Clock, Filter, LogOut, UserCheck
+  Layers, Clock, Filter, LogOut
 } from 'lucide-react';
 import { 
   getSupabase, 
@@ -41,8 +41,9 @@ export default function App() {
   const [formFloor, setFormFloor] = useState(1);
   const [formSeats, setFormSeats] = useState(4);
 
-  // Backend Realtime Connection
+  // Backend Realtime Connection & Broadcast Channel Ref
   const [supabaseConnected, setSupabaseConnected] = useState(false);
+  const realtimeChannelRef = useRef(null);
 
   // Set default floor based on staff role when logged in
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function App() {
     }
   }, [currentStaff]);
 
-  // Initialize and Fetch Tables
+  // Initial table fetch
   useEffect(() => {
     if (currentStaff) {
       initApp();
@@ -94,30 +95,77 @@ export default function App() {
     setLoading(false);
   };
 
-  // Setup Supabase Realtime Listener (multi-device live updates)
+  // Silent background refetch (used by polling & window focus)
+  const silentFetchTables = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    try {
+      const { data, error } = await supabase
+        .from('tables')
+        .select('*')
+        .order('floor', { ascending: true })
+        .order('name', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setTables(data);
+      }
+    } catch (e) {
+      // ignore background poll errors
+    }
+  };
+
+  // Setup Multi-Device Realtime Sync (Broadcast + Postgres Changes + Background Poll)
   useEffect(() => {
     if (!supabaseConnected || !currentStaff) return;
 
     const supabase = getSupabase();
     if (!supabase) return;
 
-    const channel = supabase
-      .channel('table_updates')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tables' }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setTables((prev) => {
-            if (prev.some((t) => t.id === payload.new.id)) return prev;
-            return [...prev, payload.new].sort((a, b) => a.floor - b.floor || a.name.localeCompare(b.name));
-          });
-        } else if (payload.eventType === 'UPDATE') {
-          setTables((prev) => prev.map((t) => (t.id === payload.new.id ? payload.new : t)));
-        } else if (payload.eventType === 'DELETE') {
-          setTables((prev) => prev.filter((t) => t.id === payload.old.id));
-        }
+    // 1. WebSocket Channel for Sub-second Broadcasts & DB changes
+    const channel = supabase.channel('miso_realtime_sync');
+    
+    // Instant broadcast when any staff toggles a table
+    channel
+      .on('broadcast', { event: 'table_toggled' }, ({ payload }) => {
+        if (!payload || !payload.id) return;
+        setTables((prev) =>
+          prev.map((t) =>
+            t.id === payload.id
+              ? { ...t, is_occupied: payload.is_occupied, seated_at: payload.seated_at }
+              : t
+          )
+        );
+      })
+      // Broadcast when tables are added, edited, or removed
+      .on('broadcast', { event: 'tables_updated' }, () => {
+        silentFetchTables();
+      })
+      // Direct Postgres Changes listener
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tables' }, () => {
+        silentFetchTables();
       })
       .subscribe();
 
+    realtimeChannelRef.current = channel;
+
+    // 2. Continuous Background Poll (every 2.5 seconds) to guarantee sync across phones & tablets
+    const pollInterval = setInterval(() => {
+      silentFetchTables();
+    }, 2500);
+
+    // 3. Sync immediately when waiter unlocks phone or switches back to browser tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        silentFetchTables();
+      }
+    };
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
     return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
       supabase.removeChannel(channel);
     };
   }, [supabaseConnected, currentStaff]);
@@ -146,22 +194,40 @@ export default function App() {
     const newOccupied = !table.is_occupied;
     const seatedAt = newOccupied ? new Date().toISOString() : null;
 
-    // Optimistic UI update
+    // 1. Optimistic Local Update
     const updatedTables = tables.map((t) =>
       t.id === table.id ? { ...t, is_occupied: newOccupied, seated_at: seatedAt } : t
     );
     setTables(updatedTables);
 
+    // 2. Instant Real-time WebSocket Broadcast to ALL connected devices (< 50ms)
+    if (realtimeChannelRef.current) {
+      realtimeChannelRef.current.send({
+        type: 'broadcast',
+        event: 'table_toggled',
+        payload: {
+          id: table.id,
+          is_occupied: newOccupied,
+          seated_at: seatedAt,
+        },
+      });
+    }
+
+    // 3. Persist update to Supabase Database
     if (supabaseConnected) {
       const supabase = getSupabase();
       if (supabase) {
-        const { error } = await supabase
-          .from('tables')
-          .update({ is_occupied: newOccupied, seated_at: seatedAt })
-          .eq('id', table.id);
+        try {
+          const { error } = await supabase
+            .from('tables')
+            .update({ is_occupied: newOccupied, seated_at: seatedAt })
+            .eq('id', table.id);
 
-        if (error) {
-          console.error('Failed to update table in Supabase:', error);
+          if (error) {
+            console.error('Database update error:', error);
+          }
+        } catch (err) {
+          console.error('Update failed:', err);
         }
       }
     } else {
@@ -192,6 +258,14 @@ export default function App() {
         }
         if (data && data[0]) {
           setTables((prev) => [...prev, data[0]].sort((a, b) => a.floor - b.floor || a.name.localeCompare(b.name)));
+          // Broadcast to other screens
+          if (realtimeChannelRef.current) {
+            realtimeChannelRef.current.send({
+              type: 'broadcast',
+              event: 'tables_updated',
+              payload: {},
+            });
+          }
         }
       }
     } else {
@@ -226,6 +300,13 @@ export default function App() {
           alert('Failed to update table: ' + error.message);
           return;
         }
+        if (realtimeChannelRef.current) {
+          realtimeChannelRef.current.send({
+            type: 'broadcast',
+            event: 'tables_updated',
+            payload: {},
+          });
+        }
       }
     }
 
@@ -245,6 +326,13 @@ export default function App() {
         if (error) {
           alert('Failed to delete table: ' + error.message);
           return;
+        }
+        if (realtimeChannelRef.current) {
+          realtimeChannelRef.current.send({
+            type: 'broadcast',
+            event: 'tables_updated',
+            payload: {},
+          });
         }
       }
     }
@@ -678,7 +766,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           <span>MISO Restaurant Operating System</span>
           <span>•</span>
-          <span className="text-emerald-400/90 font-medium">System Online</span>
+          <span className="text-emerald-400/90 font-medium">Real-Time Sync Active</span>
         </div>
         <div className="text-neutral-500 text-[11px]">
           Tap any table box to toggle between Available (Green) and Occupied (Red).

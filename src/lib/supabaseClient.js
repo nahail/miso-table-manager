@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get credentials from environment variables or browser localStorage
+// Read configuration from environment variables or browser localStorage
 const getCredentials = () => {
   const envUrl = import.meta.env.VITE_SUPABASE_URL;
   const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -8,8 +8,17 @@ const getCredentials = () => {
   const localUrl = localStorage.getItem('miso_supabase_url');
   const localKey = localStorage.getItem('miso_supabase_anon_key');
 
-  const supabaseUrl = (localUrl && localUrl.trim() !== '') ? localUrl.trim() : (envUrl && envUrl.trim() !== '' && !envUrl.includes('your-project-id') ? envUrl.trim() : null);
-  const supabaseKey = (localKey && localKey.trim() !== '') ? localKey.trim() : (envKey && envKey.trim() !== '' && !envKey.includes('your-anon-public-key') ? envKey.trim() : null);
+  const supabaseUrl = (localUrl && localUrl.trim() !== '') 
+    ? localUrl.trim() 
+    : (envUrl && envUrl.trim() !== '' && !envUrl.includes('your-project-id')) 
+      ? envUrl.trim() 
+      : null;
+
+  const supabaseKey = (localKey && localKey.trim() !== '') 
+    ? localKey.trim() 
+    : (envKey && envKey.trim() !== '' && !envKey.includes('your-anon-public-key')) 
+      ? envKey.trim() 
+      : null;
 
   return { supabaseUrl, supabaseKey };
 };
@@ -50,7 +59,7 @@ export const getSupabase = () => {
   return null;
 };
 
-// Initial default tables for 5 floors (used as fallback for local demo mode)
+// Initial default tables for 5 floors (fallback if empty)
 export const DEFAULT_TABLES = [
   // Floor 1
   { id: '101', name: 'Table 101', floor: 1, seats: 2, is_occupied: false, seated_at: null },
