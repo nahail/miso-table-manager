@@ -91,35 +91,35 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf7f4] text-stone-900 flex flex-col justify-center items-center p-4 sm:p-6 font-sans">
-      <div className="w-full max-w-md bg-white border border-[#5d1022]/20 rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#5d1022]/5 flex flex-col gap-6">
+    <div className="min-h-screen bg-[#5d1022] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#7a1932] via-[#5d1022] to-[#450a18] text-[#fcf6ee] flex flex-col justify-center items-center p-4 sm:p-6 font-sans">
+      <div className="w-full max-w-md bg-[#420a17]/95 border-2 border-[#d39f61] rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/50 backdrop-blur-md flex flex-col gap-6">
         {/* Brand Logo & Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-md border-2 border-[#d39f61] mb-2.5 bg-[#5d1022]">
+          {/* Official Brand Logo with Chopsticks-Bowl and Gold Banner */}
+          <div className="w-48 sm:w-52 rounded-2xl overflow-hidden shadow-xl border-2 border-[#d39f61] bg-[#5d1022] mb-3">
             <img 
               src="/logo.png" 
-              alt="MISO Asian Fusion Logo" 
-              className="w-full h-full object-cover" 
+              alt="Miso Asian Fusion" 
+              className="w-full h-auto object-contain block" 
             />
           </div>
           
-          <div className="flex flex-col items-center gap-1">
-            <h1 className="text-2xl font-black tracking-tight text-[#5d1022]">
+          <div className="flex flex-col items-center">
+            <h1 className="font-['Cinzel',_serif] text-2xl sm:text-3xl font-extrabold tracking-[0.2em] text-[#d39f61] drop-shadow-sm">
               MISO
             </h1>
-            <span className="text-[10px] font-black tracking-[0.25em] px-2.5 py-0.5 rounded bg-[#d39f61] text-[#5d1022] uppercase shadow-2xs">
+            <span className="font-['Tenor_Sans',_sans-serif] text-[11px] font-bold tracking-[0.35em] text-[#f4d9b6] uppercase mt-0.5">
               Asian Fusion
             </span>
+            <p className="text-[11px] text-[#f4d9b6]/85 mt-2 font-medium">
+              Staff Table Management &amp; Seating Portal
+            </p>
           </div>
-
-          <p className="text-xs text-stone-500 mt-2 font-medium">
-            Staff Table Management & Seating Portal
-          </p>
         </div>
 
         {/* Staff Role Selector */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold text-stone-600 uppercase tracking-wider">
+          <label className="text-xs font-bold text-[#d39f61] uppercase tracking-wider">
             Select Your Role
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -132,12 +132,12 @@ export default function Login({ onLoginSuccess }) {
                   onClick={() => handleSelectRole(preset)}
                   className={`p-3 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-[#5d1022] border-[#5d1022] shadow-sm text-white'
-                      : 'bg-[#faf7f4] border-stone-200 text-stone-700 hover:border-[#d39f61] hover:bg-stone-50'
+                      ? 'bg-[#78182f] border-[#d39f61] shadow-lg shadow-[#d39f61]/25 text-white ring-1 ring-[#d39f61]'
+                      : 'bg-[#28050e]/80 border-[#d39f61]/35 text-stone-200 hover:border-[#d39f61]/80 hover:bg-[#380814]'
                   }`}
                 >
                   <span className="text-xl">{preset.icon}</span>
-                  <span className={`text-xs font-bold leading-tight ${isSelected ? 'text-[#d39f61]' : 'text-stone-800'}`}>
+                  <span className={`text-xs font-black leading-tight ${isSelected ? 'text-[#d39f61]' : 'text-[#f4d9b6]'}`}>
                     {preset.role}
                   </span>
                 </button>
@@ -148,9 +148,9 @@ export default function Login({ onLoginSuccess }) {
 
         {/* Waiter Floor Assignment */}
         {selectedRole.role === 'Floor Waiter' && (
-          <div className="bg-[#faf7f4] border border-[#d39f61]/50 rounded-2xl p-3 flex items-center justify-between">
-            <span className="text-xs font-bold text-[#5d1022]">Assigned Floor:</span>
-            <div className="flex items-center gap-1">
+          <div className="bg-[#28050e] border border-[#d39f61]/40 rounded-2xl p-3 flex items-center justify-between">
+            <span className="text-xs font-bold text-[#d39f61]">Assigned Floor:</span>
+            <div className="flex items-center gap-1.5">
               {[1, 2, 3, 4, 5].map((fl) => (
                 <button
                   key={fl}
@@ -159,10 +159,10 @@ export default function Login({ onLoginSuccess }) {
                     setWaiterFloor(fl);
                     setStaffName(`Waiter (Floor ${fl})`);
                   }}
-                  className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`w-7 h-7 rounded-lg text-xs font-black transition-all cursor-pointer ${
                     waiterFloor === fl
-                      ? 'bg-[#5d1022] text-[#d39f61] shadow-xs'
-                      : 'bg-white border border-stone-300 text-stone-700 hover:text-stone-900'
+                      ? 'bg-[#78182f] text-[#d39f61] border border-[#d39f61] shadow-xs'
+                      : 'bg-[#3d0814] border border-[#d39f61]/30 text-stone-200 hover:text-white'
                   }`}
                 >
                   {fl}
@@ -175,7 +175,7 @@ export default function Login({ onLoginSuccess }) {
         {/* Staff Name & PIN Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-bold text-stone-700 mb-1">
+            <label className="block text-xs font-bold text-[#f4d9b6] mb-1">
               Staff Member Name
             </label>
             <input
@@ -183,35 +183,35 @@ export default function Login({ onLoginSuccess }) {
               value={staffName}
               onChange={(e) => setStaffName(e.target.value)}
               placeholder="e.g. Host / Server"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022] font-semibold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#23040c] border border-[#d39f61]/50 text-white text-sm focus:outline-none focus:border-[#d39f61] font-semibold placeholder-stone-500"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold text-stone-700">
+              <label className="block text-xs font-bold text-[#f4d9b6]">
                 Enter Staff PIN
               </label>
-              <span className="text-[11px] text-stone-500">
-                Default PIN: <strong className="font-mono text-[#5d1022] font-black">{selectedRole.pin}</strong>
+              <span className="text-[11px] text-[#f4d9b6]/80">
+                Default PIN: <strong className="font-mono text-[#d39f61] font-black">{selectedRole.pin}</strong>
               </span>
             </div>
 
             {/* PIN Display Dots */}
-            <div className="w-full h-12 bg-[#faf7f4] border border-stone-300 rounded-xl flex items-center justify-center gap-3">
+            <div className="w-full h-12 bg-[#23040c] border border-[#d39f61]/50 rounded-xl flex items-center justify-center gap-3">
               {[0, 1, 2, 3].map((idx) => (
                 <span
                   key={idx}
                   className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${
                     pin.length > idx
-                      ? 'bg-[#5d1022] scale-110 shadow-xs'
-                      : 'bg-stone-300'
+                      ? 'bg-[#d39f61] scale-110 shadow-sm shadow-[#d39f61]/60'
+                      : 'bg-[#500c1b]'
                   }`}
                 />
               ))}
             </div>
             {error && (
-              <p className="text-xs text-rose-600 mt-1.5 text-center font-bold">
+              <p className="text-xs text-rose-300 mt-1.5 text-center font-bold">
                 {error}
               </p>
             )}
@@ -224,7 +224,7 @@ export default function Login({ onLoginSuccess }) {
                 key={digit}
                 type="button"
                 onClick={() => handleKeypadPress(digit)}
-                className="h-12 rounded-xl bg-[#faf7f4] hover:bg-[#f2ece4] active:bg-[#d39f61]/30 border border-stone-200 text-base font-extrabold text-stone-900 transition-all cursor-pointer shadow-2xs"
+                className="h-12 rounded-xl bg-[#330713] hover:bg-[#4f0c1e] active:bg-[#6e142b] border border-[#d39f61]/35 text-base font-black text-white transition-all cursor-pointer shadow-xs hover:border-[#d39f61]"
               >
                 {digit}
               </button>
@@ -232,7 +232,7 @@ export default function Login({ onLoginSuccess }) {
             <button
               type="button"
               onClick={handleClear}
-              className="h-12 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 text-xs font-bold text-stone-700 transition-all cursor-pointer"
+              className="h-12 rounded-xl bg-[#22040c] hover:bg-[#330713] border border-[#d39f61]/35 text-xs font-bold text-[#f4d9b6] hover:text-white transition-all cursor-pointer"
             >
               Clear
             </button>
@@ -240,39 +240,39 @@ export default function Login({ onLoginSuccess }) {
               key="0"
               type="button"
               onClick={() => handleKeypadPress('0')}
-              className="h-12 rounded-xl bg-[#faf7f4] hover:bg-[#f2ece4] active:bg-[#d39f61]/30 border border-stone-200 text-base font-extrabold text-stone-900 transition-all cursor-pointer shadow-2xs"
+              className="h-12 rounded-xl bg-[#330713] hover:bg-[#4f0c1e] active:bg-[#6e142b] border border-[#d39f61]/35 text-base font-black text-white transition-all cursor-pointer shadow-xs hover:border-[#d39f61]"
             >
               0
             </button>
             <button
               type="button"
               onClick={handleBackspace}
-              className="h-12 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 flex items-center justify-center text-stone-700 transition-all cursor-pointer"
+              className="h-12 rounded-xl bg-[#22040c] hover:bg-[#330713] border border-[#d39f61]/35 flex items-center justify-center text-[#f4d9b6] hover:text-white transition-all cursor-pointer"
             >
               <Delete className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Login Submit Button */}
+          {/* Login Submit Button - Radiant Champagne Gold */}
           <button
             type="submit"
-            className="w-full mt-2 py-3.5 rounded-2xl bg-[#5d1022] hover:bg-[#470b19] text-[#d39f61] font-extrabold text-sm shadow-md active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 border border-[#d39f61]/40"
+            className="w-full mt-2 py-3.5 rounded-2xl bg-[#d39f61] hover:bg-[#be8c4d] text-[#360812] font-black text-base shadow-xl active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#fdf2e3]"
           >
             <span>Log In to Shift</span>
-            <ArrowRight className="w-4 h-4 text-[#d39f61]" />
+            <ArrowRight className="w-4 h-4 text-[#360812]" />
           </button>
         </form>
 
         {/* Quick Shift Access Shortcut */}
-        <div className="pt-2 border-t border-stone-200 text-center">
-          <p className="text-[11px] text-stone-500 mb-2 font-semibold">Fast 1-tap shift login:</p>
+        <div className="pt-2 border-t border-[#d39f61]/30 text-center">
+          <p className="text-[11px] text-[#f4d9b6]/80 mb-2 font-semibold">Fast 1-tap shift login:</p>
           <div className="flex items-center justify-center gap-2">
             {STAFF_PRESETS.map((p) => (
               <button
                 key={p.role}
                 type="button"
                 onClick={() => handleQuickLogin(p)}
-                className="px-2.5 py-1.5 rounded-lg bg-[#faf7f4] hover:bg-[#f2ece4] border border-[#d39f61]/50 text-[11px] font-bold text-[#5d1022] transition-colors cursor-pointer"
+                className="px-2.5 py-1.5 rounded-lg bg-[#23040c] hover:bg-[#360814] border border-[#d39f61]/50 text-[11px] font-black text-[#d39f61] transition-colors cursor-pointer"
               >
                 {p.icon} {p.role}
               </button>

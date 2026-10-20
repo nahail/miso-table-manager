@@ -4,13 +4,13 @@
 
 :root {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
-  background-color: #faf7f4;
-  color: #1c1917;
+  background-color: #150307;
+  color: #fcf6ee;
   min-height: 100vh;
   -webkit-tap-highlight-color: transparent;
 }
@@ -22,14 +22,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1ede8;
+  background: #1e040a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4c8bd;
+  background: #5d1022;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5d1022;
+  background: #d39f61;
 }
