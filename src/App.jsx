@@ -640,36 +640,27 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Card Bottom: Status & Quick Tap Prompt */}
+                  {/* Card Bottom: Status & Seated Timer */}
                   <div className={`pt-2 border-t flex items-center justify-between gap-1 ${
                     isOccupied ? 'border-rose-900/60' : 'border-emerald-900/60'
                   }`}>
-                    <div className="flex flex-col min-w-0">
-                      <div className="flex items-center gap-1">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${
-                          isOccupied ? 'bg-rose-500 shadow-sm shadow-rose-500' : 'bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400'
-                        }`} />
-                        <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider truncate ${
-                          isOccupied ? 'text-rose-300' : 'text-emerald-300'
-                        }`}>
-                          {isOccupied ? 'OCCUPIED' : 'FREE'}
-                        </span>
-                      </div>
-                      {isOccupied && table.seated_at && (
-                        <span className="text-[9px] text-rose-300 font-semibold flex items-center gap-0.5 mt-0.5 truncate">
-                          <Clock className="w-2.5 h-2.5 shrink-0" />
-                          {formatTimeSince(table.seated_at)}
-                        </span>
-                      )}
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        isOccupied ? 'bg-rose-500 shadow-sm shadow-rose-500' : 'bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400'
+                      }`} />
+                      <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider truncate ${
+                        isOccupied ? 'text-rose-300' : 'text-emerald-300'
+                      }`}>
+                        {isOccupied ? 'OCCUPIED' : 'AVAILABLE'}
+                      </span>
                     </div>
 
-                    <div className={`text-[10px] sm:text-[11px] font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95 shrink-0 ${
-                      isOccupied 
-                        ? 'bg-[#5d1022] hover:bg-[#78172e] text-[#d39f61] border border-[#d39f61] shadow-[#5d1022]/60'
-                        : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60'
-                    }`}>
-                      {isOccupied ? 'Free' : 'Seat'} ➜
-                    </div>
+                    {isOccupied && table.seated_at && (
+                      <span className="text-[9px] sm:text-[10px] text-rose-300 font-semibold flex items-center gap-0.5 shrink-0">
+                        <Clock className="w-2.5 h-2.5 shrink-0" />
+                        {formatTimeSince(table.seated_at)}
+                      </span>
+                    )}
                   </div>
                 </div>
               );
