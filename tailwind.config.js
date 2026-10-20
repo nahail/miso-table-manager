@@ -8,10 +8,15 @@ export default {
     extend: {
       colors: {
         miso: {
-          dark: '#121214',
-          card: '#1a1a1e',
-          border: '#2e2e36',
-          accent: '#e65c00',
+          burgundy: '#5d1022',
+          'burgundy-dark': '#450a18',
+          'burgundy-light': '#7a1930',
+          gold: '#d39f61',
+          'gold-dark': '#b68043',
+          'gold-light': '#f4e7d5',
+          cream: '#faf7f4',
+          surface: '#ffffff',
+          charcoal: '#1c1917',
         }
       }
     },

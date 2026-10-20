@@ -299,34 +299,34 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-stone-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#faf7f4] text-stone-900 flex flex-col font-sans">
       {/* Top Staff Navigation Bar */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200/90 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#5d1022]/15 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center text-xl shadow-xs">
-            🍜
+          <div className="w-11 h-11 rounded-xl overflow-hidden border border-[#d39f61]/60 shadow-xs bg-[#5d1022] flex items-center justify-center shrink-0">
+            <img src="/logo.png" alt="MISO" className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold tracking-tight text-stone-900 flex items-center gap-2">
-                MISO <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200">TABLES</span>
+              <h1 className="text-xl font-black tracking-tight text-[#5d1022] flex items-center gap-2">
+                MISO <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#d39f61]/20 text-[#5d1022] border border-[#d39f61]/40 tracking-wider">ASIAN FUSION</span>
               </h1>
             </div>
-            <p className="text-xs text-stone-500 font-medium">5-Story Restaurant Seating Manager</p>
+            <p className="text-xs text-stone-600 font-medium">Floor &amp; Table Seating Manager</p>
           </div>
         </div>
 
         {/* Global Summary Badge */}
-        <div className="hidden md:flex items-center gap-2 text-xs bg-stone-50 border border-stone-200 rounded-xl p-1.5 px-3">
-          <div className="flex items-center gap-1.5 pr-3 border-r border-stone-200">
+        <div className="hidden md:flex items-center gap-2 text-xs bg-[#faf7f4] border border-[#5d1022]/15 rounded-xl p-1.5 px-3">
+          <div className="flex items-center gap-1.5 pr-3 border-r border-[#5d1022]/15">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-stone-500">Available:</span>
-            <span className="font-bold text-emerald-700">{floorStats.all.free} Tables ({floorStats.all.seats} Seats)</span>
+            <span className="text-stone-600 font-medium">Available:</span>
+            <span className="font-extrabold text-emerald-800">{floorStats.all.free} Tables ({floorStats.all.seats} Seats)</span>
           </div>
           <div className="flex items-center gap-1.5 pl-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span className="text-stone-500">Occupied:</span>
-            <span className="font-bold text-rose-700">{floorStats.all.total - floorStats.all.free} Tables</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#5d1022]"></span>
+            <span className="text-stone-600 font-medium">Occupied:</span>
+            <span className="font-extrabold text-[#5d1022]">{floorStats.all.total - floorStats.all.free} Tables</span>
           </div>
         </div>
 
@@ -339,9 +339,9 @@ export default function App() {
               setFormSeats(4);
               setIsAddModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#5d1022] hover:bg-[#450a18] text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#d39f61]/30"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#d39f61]" />
             <span>Add Table</span>
           </button>
 
@@ -375,11 +375,11 @@ export default function App() {
         {/* Floor Selection Tabs */}
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-stone-500 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-stone-600" />
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#5d1022] flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-[#5d1022]" />
               Select Floor
             </h2>
-            <div className="text-xs font-medium text-stone-500">
+            <div className="text-xs font-semibold text-stone-500">
               Showing {filteredTables.length} {filteredTables.length === 1 ? 'table' : 'tables'}
             </div>
           </div>
@@ -390,16 +390,24 @@ export default function App() {
               onClick={() => setSelectedFloor('all')}
               className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
                 selectedFloor === 'all'
-                  ? 'bg-white border-2 border-stone-900 shadow-sm ring-1 ring-stone-900/10'
-                  : 'bg-white border border-stone-200 hover:border-stone-300 text-stone-700'
+                  ? 'bg-[#5d1022] border-2 border-[#5d1022] shadow-md ring-2 ring-[#d39f61]/40 text-white'
+                  : 'bg-white border border-stone-200/90 hover:border-[#5d1022]/40 text-stone-700 hover:shadow-xs'
               }`}
             >
-              <div className="text-xs font-bold text-stone-600">All Floors</div>
-              <div className="mt-1 flex items-baseline justify-between">
-                <span className="text-xl font-black text-stone-900">{floorStats.all.free}</span>
-                <span className="text-[11px] text-stone-500 font-semibold">/{floorStats.all.total} free</span>
+              <div className={`text-xs font-extrabold ${selectedFloor === 'all' ? 'text-white' : 'text-stone-700'}`}>
+                All Floors
               </div>
-              <div className="text-[10px] text-emerald-700 font-bold mt-0.5">{floorStats.all.seats} seats open</div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className={`text-2xl font-black ${selectedFloor === 'all' ? 'text-[#d39f61]' : 'text-stone-900'}`}>
+                  {floorStats.all.free}
+                </span>
+                <span className={`text-[11px] font-semibold ${selectedFloor === 'all' ? 'text-white/80' : 'text-stone-500'}`}>
+                  /{floorStats.all.total} free
+                </span>
+              </div>
+              <div className={`text-[10px] font-bold mt-0.5 ${selectedFloor === 'all' ? 'text-emerald-300' : 'text-emerald-700'}`}>
+                {floorStats.all.seats} seats open
+              </div>
             </button>
 
             {/* Individual Floors 1 to 5 */}
@@ -414,21 +422,31 @@ export default function App() {
                   onClick={() => setSelectedFloor(fl)}
                   className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
                     isSelected
-                      ? 'bg-white border-2 border-stone-900 shadow-sm ring-1 ring-stone-900/10'
-                      : 'bg-white border border-stone-200 hover:border-stone-300 text-stone-700'
+                      ? 'bg-[#5d1022] border-2 border-[#5d1022] shadow-md ring-2 ring-[#d39f61]/40 text-white'
+                      : 'bg-white border border-stone-200/90 hover:border-[#5d1022]/40 text-stone-700 hover:shadow-xs'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-stone-600">Floor {fl}</span>
-                    <span className={`w-2 h-2 rounded-full ${hasFree ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                    <span className={`text-xs font-extrabold ${isSelected ? 'text-white' : 'text-stone-700'}`}>
+                      Floor {fl}
+                    </span>
+                    <span className={`w-2 h-2 rounded-full ${hasFree ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                   </div>
                   <div className="mt-1 flex items-baseline justify-between">
-                    <span className={`text-xl font-black ${hasFree ? 'text-stone-900' : 'text-rose-600'}`}>
+                    <span className={`text-2xl font-black ${
+                      isSelected 
+                        ? (hasFree ? 'text-[#d39f61]' : 'text-rose-200')
+                        : (hasFree ? 'text-stone-900' : 'text-rose-600')
+                    }`}>
                       {stat.free}
                     </span>
-                    <span className="text-[11px] text-stone-500 font-semibold">/{stat.total} free</span>
+                    <span className={`text-[11px] font-semibold ${isSelected ? 'text-white/80' : 'text-stone-500'}`}>
+                      /{stat.total} free
+                    </span>
                   </div>
-                  <div className="text-[10px] text-stone-500 font-medium mt-0.5">
+                  <div className={`text-[10px] font-bold mt-0.5 ${
+                    isSelected ? 'text-white/85' : 'text-stone-500 font-medium'
+                  }`}>
                     {stat.seats} seats open
                   </div>
                 </button>
@@ -438,28 +456,28 @@ export default function App() {
         </section>
 
         {/* Filter & Quick Helper Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-stone-200/90 rounded-2xl p-3 px-4 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-[#5d1022]/15 rounded-2xl p-3 px-4 shadow-xs">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-stone-500 font-medium mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5 text-stone-400" />
+            <span className="text-xs text-stone-600 font-bold mr-1 flex items-center gap-1">
+              <Filter className="w-3.5 h-3.5 text-[#5d1022]" />
               Filter:
             </span>
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'all'
-                  ? 'bg-stone-900 text-white shadow-xs'
-                  : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+                  ? 'bg-[#5d1022] text-white shadow-xs'
+                  : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter('available')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'available'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs'
-                  : 'text-stone-600 hover:bg-emerald-50 hover:text-emerald-700'
+                  ? 'bg-emerald-100 text-emerald-900 border border-emerald-400 shadow-xs'
+                  : 'text-stone-700 hover:bg-emerald-50 hover:text-emerald-800'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -467,20 +485,20 @@ export default function App() {
             </button>
             <button
               onClick={() => setStatusFilter('occupied')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 statusFilter === 'occupied'
-                  ? 'bg-rose-100 text-rose-800 border border-rose-300 shadow-xs'
-                  : 'text-stone-600 hover:bg-rose-50 hover:text-rose-700'
+                  ? 'bg-[#5d1022]/15 text-[#5d1022] border border-[#5d1022]/40 shadow-xs'
+                  : 'text-stone-700 hover:bg-rose-50 hover:text-[#5d1022]'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span className="w-2 h-2 rounded-full bg-[#5d1022]"></span>
               Only Occupied (Red)
             </button>
           </div>
 
           {/* Party size filter for receptionists finding table for arriving group */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-stone-500 font-medium">Party Size:</span>
+            <span className="text-xs text-stone-600 font-bold">Party Size:</span>
             <div className="flex items-center gap-1">
               {[0, 2, 4, 6, 8].map((size) => (
                 <button
@@ -488,8 +506,8 @@ export default function App() {
                   onClick={() => setPartySizeFilter(size)}
                   className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
                     partySizeFilter === size
-                      ? 'bg-stone-900 text-white shadow-xs'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                      ? 'bg-[#5d1022] text-[#d39f61] shadow-xs'
+                      : 'bg-stone-100 text-stone-700 hover:bg-stone-200 hover:text-stone-900'
                   }`}
                 >
                   {size === 0 ? 'All' : `${size}+`}
@@ -502,12 +520,12 @@ export default function App() {
         {/* Tables Grid */}
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
-            <RefreshCw className="w-8 h-8 animate-spin text-stone-700" />
-            <p className="text-sm font-medium">Loading tables across floors...</p>
+            <RefreshCw className="w-8 h-8 animate-spin text-[#5d1022]" />
+            <p className="text-sm font-semibold text-stone-700">Loading tables across floors...</p>
           </div>
         ) : filteredTables.length === 0 ? (
-          <div className="py-20 bg-white border border-stone-200/90 rounded-3xl flex flex-col items-center justify-center text-center p-6 shadow-xs">
-            <div className="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center text-3xl mb-4 text-stone-500">
+          <div className="py-20 bg-white border border-[#5d1022]/15 rounded-3xl flex flex-col items-center justify-center text-center p-6 shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-[#faf7f4] border border-[#5d1022]/20 flex items-center justify-center text-3xl mb-4 text-[#5d1022]">
               🪑
             </div>
             <h3 className="text-base font-bold text-stone-900">No tables match your filter</h3>
@@ -520,7 +538,7 @@ export default function App() {
                 setStatusFilter('all');
                 setPartySizeFilter(0);
               }}
-              className="mt-4 px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-stone-800 transition-all cursor-pointer border border-stone-200"
+              className="mt-4 px-4 py-2 rounded-xl bg-[#faf7f4] hover:bg-[#5d1022] text-xs font-bold text-[#5d1022] hover:text-white transition-all cursor-pointer border border-[#5d1022]/30"
             >
               Reset Filters
             </button>
@@ -536,29 +554,29 @@ export default function App() {
                   onClick={() => handleToggleTable(table)}
                   className={`group relative rounded-3xl p-5 border-2 transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[195px] select-none shadow-xs hover:shadow-md ${
                     isOccupied
-                      ? 'bg-rose-50/70 border-rose-400/90 hover:bg-rose-100/70 hover:border-rose-500'
-                      : 'bg-emerald-50/70 border-emerald-500/80 hover:bg-emerald-100/70 hover:border-emerald-600'
+                      ? 'bg-rose-50/80 border-[#5d1022]/50 hover:bg-rose-100/70 hover:border-[#5d1022]'
+                      : 'bg-emerald-50/80 border-emerald-500/80 hover:bg-emerald-100/70 hover:border-emerald-600'
                   }`}
                 >
                   {/* Card Top: Floor badge & Edit/Delete controls */}
                   <div className="flex items-start justify-between">
-                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs ${
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs ${
                       isOccupied 
-                        ? 'bg-white border-rose-200 text-rose-800' 
-                        : 'bg-white border-emerald-200 text-emerald-800'
+                        ? 'bg-white border-[#5d1022]/30 text-[#5d1022]' 
+                        : 'bg-white border-emerald-300 text-emerald-900'
                     }`}>
                       Floor {table.floor}
                     </span>
 
                     {/* Manage table buttons */}
                     <div 
-                      className="opacity-70 group-hover:opacity-100 flex items-center gap-1 transition-opacity"
+                      className="opacity-75 group-hover:opacity-100 flex items-center gap-1 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
                         onClick={(e) => openEdit(table, e)}
                         title="Edit Table"
-                        className="p-1.5 rounded-lg bg-white/90 hover:bg-white text-stone-600 hover:text-stone-900 border border-stone-200/80 transition-colors cursor-pointer shadow-2xs"
+                        className="p-1.5 rounded-lg bg-white/95 hover:bg-white text-stone-700 hover:text-stone-950 border border-stone-200/90 transition-colors cursor-pointer shadow-2xs"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -593,7 +611,7 @@ export default function App() {
                             setConfirmDeleteId(table.id);
                           }}
                           title="Remove Table"
-                          className="p-1.5 rounded-lg bg-white/90 hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200/80 transition-colors cursor-pointer shadow-2xs"
+                          className="p-1.5 rounded-lg bg-white/95 hover:bg-rose-50 text-stone-500 hover:text-rose-600 border border-stone-200/90 transition-colors cursor-pointer shadow-2xs"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -603,10 +621,10 @@ export default function App() {
 
                   {/* Card Center: Table Name & Seating capacity */}
                   <div className="my-2.5">
-                    <h3 className="text-xl font-extrabold text-stone-900 tracking-tight">
+                    <h3 className="text-xl font-black text-stone-900 tracking-tight">
                       {table.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold text-stone-600">
+                    <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-stone-700">
                       <Users className="w-4 h-4 text-stone-500" />
                       <span>{table.seats} Chairs</span>
                     </div>
@@ -616,13 +634,13 @@ export default function App() {
                   <div className="pt-3 border-t border-stone-200/70 flex items-center justify-between">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${isOccupied ? 'bg-rose-500' : 'bg-emerald-500'}`} />
-                        <span className={`text-xs font-black uppercase tracking-wide ${isOccupied ? 'text-rose-800' : 'text-emerald-800'}`}>
+                        <span className={`w-2 h-2 rounded-full ${isOccupied ? 'bg-[#5d1022]' : 'bg-emerald-500'}`} />
+                        <span className={`text-xs font-black uppercase tracking-wide ${isOccupied ? 'text-[#5d1022]' : 'text-emerald-900'}`}>
                           {isOccupied ? 'OCCUPIED' : 'AVAILABLE'}
                         </span>
                       </div>
                       {isOccupied && table.seated_at && (
-                        <span className="text-[10px] text-stone-500 font-medium flex items-center gap-1 mt-0.5">
+                        <span className="text-[10px] text-stone-600 font-semibold flex items-center gap-1 mt-0.5">
                           <Clock className="w-2.5 h-2.5" />
                           {formatTimeSince(table.seated_at)}
                         </span>
@@ -631,7 +649,7 @@ export default function App() {
 
                     <div className={`text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all shadow-xs ${
                       isOccupied 
-                        ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                        ? 'bg-[#5d1022] hover:bg-[#450a18] text-[#d39f61] border border-[#d39f61]/30'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}>
                       {isOccupied ? 'Free Up ➜' : 'Seat Guests ➜'}
@@ -645,13 +663,16 @@ export default function App() {
       </main>
 
       {/* Clean Restaurant Footer */}
-      <footer className="mt-auto border-t border-stone-200 bg-white px-4 py-3.5 text-center text-xs text-stone-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="mt-auto border-t border-[#5d1022]/15 bg-white px-4 py-3.5 text-center text-xs text-stone-600 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-stone-700">MISO Restaurant System</span>
+          <span className="font-extrabold text-[#5d1022]">MISO Asian Fusion</span>
           <span>•</span>
-          <span className="text-emerald-700 font-medium">Real-Time Sync Active</span>
+          <span className="text-emerald-800 font-bold flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Real-Time Sync Active
+          </span>
         </div>
-        <div className="text-stone-500 text-[11px]">
+        <div className="text-stone-500 text-[11px] font-medium">
           Tap any table box to toggle between Available (Green) and Occupied (Red).
         </div>
       </footer>
@@ -659,10 +680,10 @@ export default function App() {
       {/* ADD TABLE MODAL */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#5d1022]/20 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-stone-200">
-              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-stone-900" />
+              <h3 className="text-base font-extrabold text-[#5d1022] flex items-center gap-2">
+                <Plus className="w-5 h-5 text-[#5d1022]" />
                 Add New Table
               </h3>
               <button
@@ -675,7 +696,7 @@ export default function App() {
 
             <form onSubmit={handleAddTable} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
                   Table Name or Number
                 </label>
                 <input
@@ -684,19 +705,19 @@ export default function App() {
                   placeholder="e.g. Table 106, VIP Booth, Window 1"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
                     Floor Level
                   </label>
                   <select
                     value={formFloor}
                     onChange={(e) => setFormFloor(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                   >
                     {[1, 2, 3, 4, 5].map((fl) => (
                       <option key={fl} value={fl}>Floor {fl}</option>
@@ -705,7 +726,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
                     Chairs / Capacity
                   </label>
                   <input
@@ -715,7 +736,7 @@ export default function App() {
                     required
                     value={formSeats}
                     onChange={(e) => setFormSeats(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                   />
                 </div>
               </div>
@@ -724,13 +745,13 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-900 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-[#5d1022] hover:bg-[#450a18] text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer border border-[#d39f61]/30"
                 >
                   Create Table
                 </button>
@@ -743,10 +764,10 @@ export default function App() {
       {/* EDIT TABLE MODAL */}
       {editingTable && (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white border border-[#5d1022]/20 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-stone-200">
-              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-stone-900" />
+              <h3 className="text-base font-extrabold text-[#5d1022] flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-[#5d1022]" />
                 Edit Table
               </h3>
               <button
@@ -759,7 +780,7 @@ export default function App() {
 
             <form onSubmit={handleSaveEdit} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                <label className="block text-xs font-bold text-stone-800 mb-1.5">
                   Table Name
                 </label>
                 <input
@@ -767,19 +788,19 @@ export default function App() {
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
                     Floor Level
                   </label>
                   <select
                     value={formFloor}
                     onChange={(e) => setFormFloor(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                   >
                     {[1, 2, 3, 4, 5].map((fl) => (
                       <option key={fl} value={fl}>Floor {fl}</option>
@@ -788,7 +809,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1.5">
+                  <label className="block text-xs font-bold text-stone-800 mb-1.5">
                     Chairs / Capacity
                   </label>
                   <input
@@ -798,7 +819,7 @@ export default function App() {
                     required
                     value={formSeats}
                     onChange={(e) => setFormSeats(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-stone-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#faf7f4] border border-stone-300 text-stone-900 text-sm focus:outline-none focus:bg-white focus:border-[#5d1022]"
                   />
                 </div>
               </div>
@@ -807,13 +828,13 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setEditingTable(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-900 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-[#5d1022] hover:bg-[#450a18] text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer border border-[#d39f61]/30"
                 >
                   Save Changes
                 </button>
