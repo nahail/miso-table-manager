@@ -544,7 +544,7 @@ export default function App() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
             {filteredTables.map((table) => {
               const isOccupied = table.is_occupied;
 
@@ -552,50 +552,50 @@ export default function App() {
                 <div
                   key={table.id || `${table.floor}-${table.name}`}
                   onClick={() => handleToggleTable(table)}
-                  className={`group relative rounded-3xl p-5 border-2 transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[195px] select-none shadow-xl ${
+                  className={`group relative rounded-2xl p-3 sm:p-4 border-2 transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[128px] sm:min-h-[160px] select-none shadow-md ${
                     isOccupied
                       ? 'bg-[#2d0712] border-rose-600 shadow-rose-950/40 hover:bg-[#380a18] hover:border-rose-500'
                       : 'bg-[#0a2318] border-emerald-500 shadow-emerald-950/40 hover:bg-[#0e2e20] hover:border-emerald-400'
                   }`}
                 >
                   {/* Card Top: Floor badge & Edit/Delete controls */}
-                  <div className="flex items-start justify-between">
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-2xs ${
+                  <div className="flex items-center justify-between gap-1">
+                    <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-md border shadow-2xs ${
                       isOccupied 
                         ? 'bg-[#180308] border-rose-500/70 text-rose-300' 
                         : 'bg-[#04140e] border-emerald-500/70 text-emerald-300'
                     }`}>
-                      Floor {table.floor}
+                      Fl {table.floor}
                     </span>
 
                     {/* Manage table buttons */}
                     <div 
-                      className="opacity-75 group-hover:opacity-100 flex items-center gap-1 transition-opacity"
+                      className="opacity-75 group-hover:opacity-100 flex items-center gap-0.5 sm:gap-1 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
                         onClick={(e) => openEdit(table, e)}
                         title="Edit Table"
-                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer shadow-2xs ${
+                        className={`p-1 rounded border transition-colors cursor-pointer shadow-2xs ${
                           isOccupied
                             ? 'bg-[#180308] hover:bg-[#28050e] text-rose-300 hover:text-white border-rose-600/70'
                             : 'bg-[#04140e] hover:bg-[#0a261a] text-emerald-300 hover:text-white border-emerald-600/70'
                         }`}
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
                       
                       {confirmDeleteId === table.id ? (
-                        <div className="flex items-center gap-1 bg-[#180308] rounded-lg p-0.5 border border-rose-500 shadow-xs">
+                        <div className="flex items-center gap-0.5 bg-[#180308] rounded p-0.5 border border-rose-500 shadow-xs">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteTable(table.id);
                             }}
                             title="Confirm delete"
-                            className="p-1 rounded text-rose-400 hover:bg-rose-950"
+                            className="p-0.5 rounded text-rose-400 hover:bg-rose-950"
                           >
-                            <Check className="w-3.5 h-3.5 text-rose-400" />
+                            <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400" />
                           </button>
                           <button
                             onClick={(e) => {
@@ -603,9 +603,9 @@ export default function App() {
                               setConfirmDeleteId(null);
                             }}
                             title="Cancel"
-                            className="p-1 rounded text-stone-400 hover:bg-[#28050e]"
+                            className="p-0.5 rounded text-stone-400 hover:bg-[#28050e]"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           </button>
                         </div>
                       ) : (
@@ -615,60 +615,60 @@ export default function App() {
                             setConfirmDeleteId(table.id);
                           }}
                           title="Remove Table"
-                          className={`p-1.5 rounded-lg border transition-colors cursor-pointer shadow-2xs ${
+                          className={`p-1 rounded border transition-colors cursor-pointer shadow-2xs ${
                             isOccupied
                               ? 'bg-[#180308] hover:bg-rose-950 text-rose-400 border-rose-600/70'
                               : 'bg-[#04140e] hover:bg-rose-950 text-stone-400 hover:text-rose-400 border-emerald-600/70'
                           }`}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         </button>
                       )}
                     </div>
                   </div>
 
                   {/* Card Center: Table Name & Seating capacity */}
-                  <div className="my-2.5">
-                    <h3 className="text-2xl font-black text-white tracking-tight drop-shadow-xs">
+                  <div className="my-1.5 sm:my-2">
+                    <h3 className="text-base sm:text-xl font-black text-white tracking-tight drop-shadow-xs truncate">
                       {table.name}
                     </h3>
-                    <div className={`flex items-center gap-1.5 mt-1 text-xs font-bold ${
+                    <div className={`flex items-center gap-1 mt-0.5 text-[11px] sm:text-xs font-bold ${
                       isOccupied ? 'text-rose-200' : 'text-emerald-200'
                     }`}>
-                      <Users className={`w-4 h-4 ${isOccupied ? 'text-rose-400' : 'text-emerald-400'}`} />
+                      <Users className={`w-3.5 h-3.5 ${isOccupied ? 'text-rose-400' : 'text-emerald-400'}`} />
                       <span>{table.seats} Chairs</span>
                     </div>
                   </div>
 
                   {/* Card Bottom: Status & Quick Tap Prompt */}
-                  <div className={`pt-3 border-t flex items-center justify-between ${
+                  <div className={`pt-2 border-t flex items-center justify-between gap-1 ${
                     isOccupied ? 'border-rose-900/60' : 'border-emerald-900/60'
                   }`}>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`w-2.5 h-2.5 rounded-full ${
+                    <div className="flex flex-col min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${
                           isOccupied ? 'bg-rose-500 shadow-sm shadow-rose-500' : 'bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400'
                         }`} />
-                        <span className={`text-xs font-black uppercase tracking-wider ${
+                        <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider truncate ${
                           isOccupied ? 'text-rose-300' : 'text-emerald-300'
                         }`}>
-                          {isOccupied ? 'OCCUPIED' : 'AVAILABLE'}
+                          {isOccupied ? 'OCCUPIED' : 'FREE'}
                         </span>
                       </div>
                       {isOccupied && table.seated_at && (
-                        <span className="text-[10px] text-rose-300 font-semibold flex items-center gap-1 mt-0.5">
-                          <Clock className="w-2.5 h-2.5" />
+                        <span className="text-[9px] text-rose-300 font-semibold flex items-center gap-0.5 mt-0.5 truncate">
+                          <Clock className="w-2.5 h-2.5 shrink-0" />
                           {formatTimeSince(table.seated_at)}
                         </span>
                       )}
                     </div>
 
-                    <div className={`text-[11px] font-black px-3.5 py-2 rounded-xl transition-all shadow-md active:scale-95 ${
+                    <div className={`text-[10px] sm:text-[11px] font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95 shrink-0 ${
                       isOccupied 
                         ? 'bg-[#5d1022] hover:bg-[#78172e] text-[#d39f61] border border-[#d39f61] shadow-[#5d1022]/60'
                         : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60'
                     }`}>
-                      {isOccupied ? 'Free Up ➜' : 'Seat Guests ➜'}
+                      {isOccupied ? 'Free' : 'Seat'} ➜
                     </div>
                   </div>
                 </div>
